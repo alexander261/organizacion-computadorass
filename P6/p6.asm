@@ -14,15 +14,12 @@ _start:
 	call putchar
     ;-------------
 
-
     ;------------------------------- INCISO A
-    ;mov eax,0x12345678
-
-    mov ebx,0x00000001
-    mov eax,0x11111110
+    mov ebx,0x5C4B2A60 ;Valor a sumar
+    mov eax,0x2207511 ;Matricula
 
     add eax,ebx
-    call pHex_dw  
+    call pHex_dw ;resultado = 0x5E6B-9F71
 
     ;Guardamos el resultado de la suma en EBX
     mov ebx,eax
@@ -34,12 +31,13 @@ _start:
     
     ;------------------------------- INCISO B 
     ;Guardamos los 16bits menos significativos  de EBX en la pila 
-    push bx
+    push bx ;resultado = 9F71
 
     ;------------------------------- INCISO C
-    mov al,3
+    
+    mov al,8
     mul bl
-    call pHex_dw
+    call pHex_w ;resultado: AX=0388
 
     ;Guardamos el valor de la multiplicacion en la variable N 
     mov word[N],ax
@@ -49,15 +47,67 @@ _start:
 	call putchar
     ;-------------
 
-
+    ;-------------------------------- INCISO D 
     ;Incrementamos el valor de N
     INC word[N]
+
+    ;------------------------------- INCISO E
+    mov dx,0
+    mov ax,bx
+    mov bx,0x00FF
+    div bx ;AX = cociente y en DX = residuo
+
+    call pHex_w ;Imprimir Cociente
+
+    ;------------- Salto de Linea
+	mov al,10
+	call putchar
+    ;-------------
+
+    mov ax,dx
+    call pHex_w ;Imprimir Residuo
+
+    ;------------- Salto de Linea
+	mov al,10
+	call putchar
+    ;-------------
+
+
+    ;------------------------------- INCISO F y G
+    ADD word[N],dx
+    DEC word[N]
+    
+    ;Guardamos las banderas
+    pushfd
+    pop eax
+    call pHex_dw ;Imprimir los valores de la pila
+
+    ;------------- Salto de Linea
+	mov al,10
+	call putchar
+    ;-------------
+    
+    ;------------------------------INCISO H
+    pop ax
+    call pHex_w
+
+    ;------------- Salto de Linea
+	mov al,10
+	call putchar
+    ;-------------
+
+
+    ;Imprimimos el Valor de N
     mov ax,[N]
-    call pHex_dw
+    ;call pHex_w
+    ;------------- Salto de Linea
+	mov al,10
+	call putchar
+    ;-------------
 
 
-    mov eax,1
-    int 0x80
+	mov	eax, 1
+	int	0x80
 
 section .data
-N dw 0
+    N dw 0
