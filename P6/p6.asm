@@ -81,6 +81,9 @@ _start:
     pushfd
     pop eax
     call pHex_dw ;Imprimir los valores de la pila
+    ;Que banderas estan activas? al momento de usar INC y DEC
+    ;Se actualizan todas las banderas a excepcion de la bandera de Acarreo
+    
 
     ;------------- Salto de Linea
 	mov al,10
