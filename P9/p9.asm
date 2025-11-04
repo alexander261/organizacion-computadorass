@@ -38,7 +38,9 @@ _start:
     mov ebx,vector1
     mov edx,vector2
     mov ecx,N
-    call SUMAR_VECTORES
+            mov esi,0
+
+    call NUMEROS_VECTORES_SUMAR
 
 
     mov al,10
@@ -55,14 +57,12 @@ _start:
 
     mov eax,1
     int 0x80
-
-    SUMAR_VECTORES:
-        mov esi,0
         
         NUMEROS_VECTORES_SUMAR:
 
             push ebx
             push edx
+            push ecx
 
             ; (x1 + x2 + ...), (y1 + y2 +...)
             mov eax,[ebx + esi] ; X1
@@ -70,6 +70,7 @@ _start:
 
             add eax,ebx
 
+            pop ecx
             pop edx
             pop ebx
 
