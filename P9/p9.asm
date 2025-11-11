@@ -7,99 +7,148 @@ extern pBin_dw
 
 ; nasm -f elf p9.asm && ld -m elf_i386 -o P9 p9.o ../LIB/pbin.o  ../LIB/libpc_iox.a && ./P9
 section .data
-    N equ 2
-    vector1 times 10 db 0
-    vector2 times 10 db 0
+    N equ 3
+    vector1 times N db 0
+    vector2 times N db 0
 
 section .text
     global _start
 
 _start:
         
+    mov ecx,N
+
     mov ebx,vector1
-    mov ecx,N
-    mov esi,0
-    call PEDIR_NUMEROS_VECTOR
-
-    mov al,10
-    call putchar
-
-
+    call CAPTURAR_VECTOR
+    call PRINT_SALTO_DE_LINEA
+    
     mov ebx,vector2
-    mov ecx,N
-    mov esi,0
-    call PEDIR_NUMEROS_VECTOR
-
-
-    mov al,10
-    call putchar
-
+    call CAPTURAR_VECTOR
+    call PRINT_SALTO_DE_LINEA
+    call PRINT_SALTO_DE_LINEA
 
     mov ebx,vector1
     mov edx,vector2
-    mov ecx,N
-            mov esi,0
 
-    call NUMEROS_VECTORES_SUMAR
-
-
-    mov al,10
-    call putchar
-
-
-    mov ebx,vector1
-    mov esi,0
-    mov ecx,N
+    call SUMAR_VECTOR
     call MOSTRAR_NUMEROS_VECTOR
 
-    mov al,10
-    call putchar
+
+    call PRINT_SALTO_DE_LINEA
+    call PRODUCTO_ESCALAR_VECTOR
+    call PRINT_SALTO_DE_LINEA
 
     mov eax,1
     int 0x80
         
-        NUMEROS_VECTORES_SUMAR:
+        PRINT_SALTO_DE_LINEA:
+            push eax
+            
+            mov al,10
+            call putchar
 
-            push ebx
-            push edx
+            pop eax
+            ret
+
+        SUMAR_VECTOR:
+
             push ecx
+            push eax
+            push esi
+            
+            xor esi,esi
 
-            ; (x1 + x2 + ...), (y1 + y2 +...)
-            mov eax,[ebx + esi] ; X1
-            mov ebx,[edx + esi] ; X2
+            NUMERO_SUMAR_VECTOR:
 
-            add eax,ebx
+                ; (x1 + x2 + ...), (y1 + y2 +...)
+                mov al,[edx + esi]
+                add [ebx + esi],al
+                inc esi
 
-            pop ecx
-            pop edx
-            pop ebx
-
-            mov [ebx + esi],eax
-            inc esi
-
-            loop NUMEROS_VECTORES_SUMAR
+                loop NUMERO_SUMAR_VECTOR
         
+            FIN_SUMAR_VECTOR:
+                pop esi
+                pop eax
+                pop ecx
+
         ret
 
     MOSTRAR_NUMEROS_VECTOR:
-        mov al,[ebx + esi]
-        call pHex_b        
-        inc esi
-        mov al,10
-        call putchar
-        loop MOSTRAR_NUMEROS_VECTOR
+
+        push ecx
+        push eax
+        push esi
+
+        CMP ecx,0
+            JB FIN_MOSTRAR_NUMEROS_VECTOR
+        CMP ecx,10
+            JA FIN_MOSTRAR_NUMEROS_VECTOR
+
+        MOSTRAR_NUMERO_VECTOR:
+            mov al,[ebx + esi]
+            call pHex_b        
+            inc esi
+            mov al,10
+            call putchar
+            loop MOSTRAR_NUMERO_VECTOR
+        
+        FIN_MOSTRAR_NUMEROS_VECTOR:
+            pop esi
+            pop eax
+            pop ecx
+
         ret
 
-    PEDIR_NUMEROS_VECTOR:
-        call getch
-        CMP al,'9'
-            JA PEDIR_NUMEROS_VECTOR ;es mayor a '9'
-        CMP al,'0'
-            JB PEDIR_NUMEROS_VECTOR ; Es menor a '0'
-        call putchar
-        sub al,'0'
-        mov [ebx + esi],al
-        inc esi
-        loop PEDIR_NUMEROS_VECTOR
-        ret
+    CAPTURAR_VECTOR:
 
+        push ecx
+        push eax
+        push esi
+
+        CMP ecx,0
+            JB FIN_CAPTURAR_VECTOR
+        CMP ecx,10
+            JA FIN_CAPTURAR_VECTOR
+        
+
+        PEDIR_NUMEROS_VECTOR:
+            call getch
+            CMP al,'9'
+                JA PEDIR_NUMEROS_VECTOR ;es mayor a '9'
+            CMP al,'0'
+                JB PEDIR_NUMEROS_VECTOR ; Es menor a '0'
+            call putchar
+            sub al,'0'
+            mov [ebx + esi],al
+            inc esi
+            loop PEDIR_NUMEROS_VECTOR
+    
+        FIN_CAPTURAR_VECTOR:
+            pop esi
+            pop eax
+            pop ecx
+
+    ret
+
+
+    PRODUCTO_ESCALAR_VECTOR:
+
+        push ecx
+        push esi
+
+        xor esi,esi
+
+        SUMAR_VALOR:
+
+            add eax,[ebx + esi]
+            inc esi
+
+            loop SUMAR_VALOR
+
+        call pHex_b
+
+        pop esi
+        pop ecx
+
+    ret
