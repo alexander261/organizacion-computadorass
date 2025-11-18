@@ -5,39 +5,48 @@ extern putchar
 
 section .text
     global pBin8b
+    global pBin16b
+    global pBin32b
+
 pBin8b:
     push ebp
     mov ebp,esp
 
     mov eax,[ebp + 8]
+    shl eax,24
+
     mov ecx,8
     mov esi,0
 
-    IMPRIMIR_BIT:
-        push ecx
-        push eax
+    call PRINT_BITS
 
-        inc esi
-        mov ecx,esi
-        
-        
-        shl al,cl
-            JC IMPRIMIR_UNO
-        
-        mov al,'0'
-        JMP CONTINUAR_IMPRIMIR_BIT
+    pop ebp
+    ret
+pBin16b:
+    push ebp
+    mov ebp,esp
 
-        IMPRIMIR_UNO:
-            mov al,'1'
-        
-    CONTINUAR_IMPRIMIR_BIT:
-        call myPutchar
-        
-        pop eax
-        pop ecx
+    mov eax,[ebp + 8]
+    shl eax,16
 
-        LOOP IMPRIMIR_BIT
+    mov ecx,16
+    mov esi,0
 
+    call PRINT_BITS
+
+    pop ebp
+    ret
+
+pBin32b:
+    push ebp
+    mov ebp,esp
+
+    mov eax,[ebp + 8]
+
+    mov ecx,32
+    mov esi,0
+
+    call PRINT_BITS
 
     pop ebp
     ret
@@ -56,3 +65,32 @@ myPutchar:
     pop eax
     ret
 
+
+PRINT_BITS:
+
+    IMPRIMIR_BIT:
+        push ecx
+        push eax
+
+        inc esi
+        mov ecx,esi
+        
+        
+        shl eax,cl
+            JC IMPRIMIR_UNO
+        
+        mov al,'0'
+        JMP CONTINUAR_IMPRIMIR_BIT
+
+        IMPRIMIR_UNO:
+            mov al,'1'
+        
+    CONTINUAR_IMPRIMIR_BIT:
+        call myPutchar
+        
+        pop eax
+        pop ecx
+
+        LOOP IMPRIMIR_BIT
+
+ret
