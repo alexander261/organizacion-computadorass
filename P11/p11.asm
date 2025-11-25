@@ -1,4 +1,4 @@
-;gcc -m32 main.c p11.o ../LIB/libpc_iox.a -o main
+;gcc -m32 main.c p11.o  -o main
 ;nasm -f elf p11.asm
 
 extern putchar
@@ -9,6 +9,7 @@ section .text
     global pBin32b
 
 pBin8b:
+
     push ebp
     mov ebp,esp
 
